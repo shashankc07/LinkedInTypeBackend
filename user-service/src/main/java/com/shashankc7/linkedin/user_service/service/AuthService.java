@@ -1,5 +1,6 @@
 package com.shashankc7.linkedin.user_service.service;
 
+import com.shashankc7.linkedin.user_service.clients.ConnectionsClient;
 import com.shashankc7.linkedin.user_service.dto.LoginRequestDto;
 import com.shashankc7.linkedin.user_service.dto.SignupRequestDto;
 import com.shashankc7.linkedin.user_service.dto.UserDto;
@@ -22,6 +23,7 @@ public class AuthService
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
     private final JWTService jwtService;
+    private final ConnectionsClient connectionsClient;
 
     public UserDto signUp(SignupRequestDto signupRequestDto)
     {
@@ -36,6 +38,9 @@ public class AuthService
         user.setPassword(PasswordUtil.hashPassword(signupRequestDto.getPassword()));
 
         User savedUser = userRepository.save(user);
+
+        connectionsClient.createPerson(modelMapper.map(savedUser, UserDto.class));
+
         return modelMapper.map(savedUser, UserDto.class);
     }
 
